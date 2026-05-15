@@ -2,6 +2,7 @@
 English Translation of GachiTora! Abarenbou Kyoushi in High School on PSP
 
 # What's been done so far
+- pspformat.png partly breaks down the PSP archive format (I figured out more stuff later that I need to document)
 - psp_extract.py extracts the .BIN archives into a folder
 - psp_build.py rebuilds a .BIN archive with the given folder
 - zar.py extracts a text file into an easier to edit .txt file
