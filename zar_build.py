@@ -50,16 +50,13 @@ for i in range(lineCount):
     if encode == "utf_16":
         linedata = bytearray(line.encode(encoding=encode))
         linedata = linedata[2:]
-        print(linedata)
 
         if linedata == b'':
             line = ""
         else:
             line = linedata.decode(encoding=encode)
-    print(line)
 
     lineSize = len(line)
-    print(lineSize)
 
     if encode == "utf_16":
         lineSize = len(line) * 2
@@ -72,43 +69,31 @@ for i in range(lineCount):
         paddingSize = paddingSize + 32
     if lineSize == 0:
         paddingSize = 32
-    
-
-
-    #lineSize = len(line)+1
-
-    print(lineSize)
-    print(paddingSize)
 
     lineInfo.append([line, lineSize, paddingSize, linedata])
 
 newFile.seek(offset1 + offset2)
 newFile.read(8)
 
+totalOffset = offset2 + offset3
+
 for i in range(lineCount):
     newFile.read(2)
     size = len(lineInfo[i][0]) + 1
     
     newFile.write(size.to_bytes(2, byteorder="little"))
-
-    if i == 0:
-        lineOffset = int.from_bytes(newFile.read(4), "little")
-        totalOffset = lineOffset
-        print(f"{lineOffset:X}")
-    else:
-        newFile.write(totalOffset.to_bytes(4, byteorder="little"))
-    totalOffset = totalOffset + lineInfo[i][1] + lineInfo[i][2]
     print(f"{totalOffset:X}")
+    newFile.write(totalOffset.to_bytes(4, byteorder="little"))
+    
+    totalOffset = totalOffset + lineInfo[i][1] + lineInfo[i][2]
     
 
-newFile.seek(offset2+lineOffset)
+newFile.seek(offset2 + offset3 + offset2)
 
 for i in range(lineCount):
-
-    print(i)
     
     newFile.write(lineInfo[i][3])
-    if i == lineCount - 1:
+    if i != lineCount - 1:
     
         newFile.write(bytes(lineInfo[i][2]))
 
