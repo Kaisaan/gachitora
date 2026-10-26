@@ -97,4 +97,79 @@ def extract_zar(zarPath: Path):
         #outFile.write(f"{lineInfo2[i][0]:X}\t{lineInfo2[i][1]:X}\t{lineInfo2[i][2]:X}\t{lineInfo2[i][3]:X}\t{lineInfo1[i][0]:X}\t{lineInfo1[i][1]:X}\t\t{line}\n")
         outFile.write(f"{line}\n")
 
+def rebuild_zar(txtPath: Path):
+
+    txtFile = open(txtPath, "r", encoding="utf-8")
+    
+    newFile = open((txtPath.parent / (txtPath.stem + "_new.bin")), "r+b")
+
+    fileInfo = txtFile.readline().strip("\n").split()
+
+    encode = fileInfo[0]
+
+    if (encode in ["utf_16", "shiftjis"]):
+        pass
+    else:
+        exit(f"Encoding {fileInfo[0]} not supported")    
+
+    lineCount = int(fileInfo[1], base=10)
+    offset1 = int(fileInfo[2], base=16)
+    offset2 = int(fileInfo[3], base=16)
+    offset3 = int(fileInfo[4], base=16)
+
+    lineInfo = []
+
+    for i in range(lineCount):
+        line = txtFile.readline().strip("\n")
+        line = line.replace("\\n", "\n")
+
+        if encode == "utf_16":
+            linedata = bytearray(line.encode(encoding=encode))
+            linedata = linedata[2:]
+
+            if linedata == b'':
+                line = ""
+            else:
+                line = linedata.decode(encoding=encode)
+
+        lineSize = len(line)
+
+        if encode == "utf_16":
+            lineSize = len(line) * 2
+
+        if i == lineCount-1:
+            paddingSize = 0
+        else:
+            paddingSize = 32 - (lineSize % 32)
+        if (lineSize % 32) < 3:
+            paddingSize = paddingSize + 32
+        if lineSize == 0:
+            paddingSize = 32
+
+        lineInfo.append([line, lineSize, paddingSize, linedata])
+
+    newFile.seek(offset1 + offset2)
+    newFile.read(8)
+
+    totalOffset = offset2 + offset3
+
+    for i in range(lineCount):
+        newFile.read(2)
+        size = len(lineInfo[i][0]) + 1
+        
+        newFile.write(size.to_bytes(2, byteorder="little"))
+
+        newFile.write(totalOffset.to_bytes(4, byteorder="little"))
+        
+        totalOffset = totalOffset + lineInfo[i][1] + lineInfo[i][2]
+        
+
+    newFile.seek(offset2 + offset3 + offset2)
+
+    for i in range(lineCount):
+        
+        newFile.write(lineInfo[i][3])
+        if i != lineCount - 1:
+        
+            newFile.write(bytes(lineInfo[i][2]))
 

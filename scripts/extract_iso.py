@@ -11,7 +11,7 @@ from pathlib import Path
 from hacktools import psp
 from tasks.extract_files import extract_files
 from tasks.extract_text import extract_text
-from tasks.exctract_graphics import extract_graphics
+from tasks.extract_graphics import extract_graphics
 
 FILES = [
     Path("extracted/PSP_GAME/USRDIR/DATA/layout/01/LS01S01.BIN"),

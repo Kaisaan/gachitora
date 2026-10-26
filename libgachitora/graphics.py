@@ -18,3 +18,21 @@ def extract_gim(gimPath: Path, type: str):
         if result.stderr:
             sys.stderr.write(f"stderr:\n{result.stderr}\n")
         sys.exit(result.returncode)
+
+def rebuild_gim(pngPath: Path, type: str):
+    gimconv = Path("bin/gimconv/GimConv.exe")
+    outGim = pngPath.stem + "_new.gim"
+
+    result = subprocess.run(
+        [gimconv, pngPath, type, "-o", outGim],
+        capture_output=True,
+        text=True,
+        shell=False,
+    )
+    if result.stdout:
+        sys.stdout.write(result.stdout)
+    if result.returncode != 0:
+        sys.stderr.write(f"GimConv failed with return code {result.returncode}\n")
+        if result.stderr:
+            sys.stderr.write(f"stderr:\n{result.stderr}\n")
+        sys.exit(result.returncode)

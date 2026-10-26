@@ -39,7 +39,7 @@ def extract_psp(pspPath: Path):
 
         files.append([fileOffset, fileSize])
 
-    logFile.write(f"{pspPath.name}\t{fileCount}\t{unknown1}\t{unknown2}\n")
+    logFile.write(f"{pspPath.stem}\t{fileCount}\t{unknown1}\t{unknown2}\n")
 
     for i in range(fileCount):         # Then write all the files
 
@@ -49,7 +49,45 @@ def extract_psp(pspPath: Path):
         with open(Path(outFolder / f"{pspPath.stem}_{i}.bin"), "wb") as outFile:
             outFile.write(outData)
         
-        logFile.write(f"{pspFile}_{i}.bin\t{files[i][0]}\t{files[i][1]}\n")
+        logFile.write(f"{pspPath.stem}_{i}.bin\t{files[i][0]}\t{files[i][1]}\n")
 
     print(f"{pspPath.name} extracted to {outFolder}")
-        
+
+def rebuild_psp(txtPath: Path):
+
+    txtFile = open(txtPath, "r", encoding="utf-8")
+
+    fileInfo = txtFile.readline().strip("\n").split()
+
+    print(fileInfo)
+
+    filePath = "work" / Path(fileInfo[0])
+    print(filePath)
+    fileCount = int(fileInfo[1])
+    unknown1 = struct.pack('<f', float(fileInfo[2]))
+    unknown2 = struct.pack('<i', int(fileInfo[3]))
+
+    outFile = open(f"{filePath}_new.bin", "wb+")
+
+    outFile.write(b"PSP\x00")
+    outFile.write(unknown1)
+    outFile.write(struct.pack('<i', fileCount))
+    outFile.write(unknown2)
+
+    fileoffset = ((fileCount * 8) + 16) # Each file has offset & size (two 4 byte int) and header is 16 bytes
+
+    for i in range(fileCount):
+
+        outFile.write(struct.pack('<i', fileoffset))
+        filesize = os.path.getsize(Path(f"{filePath}\\{filePath.stem}_{i}.bin"))
+        outFile.write(struct.pack('<i', filesize))
+        padding = 16 - (filesize % 16)
+        fileoffset = fileoffset + filesize + padding
+
+    for i in range(fileCount):
+        with open(f"{filePath}\\{filePath.stem}_{i}.bin", "rb") as txtFile:
+            fileData = txtFile.read()
+            outFile.write(fileData)
+
+            padding = 16 - (len(fileData) % 16)
+            outFile.write(bytes(padding))   
