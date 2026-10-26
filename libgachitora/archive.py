@@ -2,12 +2,11 @@ import os, struct
 from pathlib import Path
 
 PSP_MAGIC = b"PSP\x00"
-ZAR_MAGIC = b"ZAR\x00"
 
 def readint(b: bytes) -> int:
     return int.from_bytes(b, byteorder="little")
 
-def extract_zar(pspPath: Path):
+def extract_psp(pspPath: Path):
 
     pspFile = open(pspPath, "rb")
 
