@@ -2,20 +2,15 @@
 English Translation of GachiTora! Abarenbou Kyoushi in High School on PSP
 
 # What's been done so far
-- pspformat.png partly breaks down the PSP archive format (I figured out more stuff later that I need to document)
-- psp_extract.py extracts the .BIN archives into a folder
-- psp_build.py rebuilds a .BIN archive with the given folder
-- zar.py extracts a text file into an easier to edit .txt file
-- GimConv.cfg has been editted to include two new options -gachi1 and -gachi2 to convert PNG/GIM files into the correct formatted GIM file
-
+This is a framework written in python to extract files from archives, extract text from files, and convert graphics formats.  
 # To-do
-- Make a zar rebuilder
-- Document the file formats properly
-- Look into the other file formats
+- Update File Format Documentation
+- Research more about the ZAR format
 
 # Other Stuff
 - [Link to the gachitora demo](https://www.spike-chunsoft.co.jp/pages/gachitora/demo/demo03.html)
 - [Video about the game by Protoman85](https://youtu.be/7NM71hUhoG8)
 
 # Credits
-- Etokapa, producing this translation
+- Etokapa - Producing this Project
+- [Illidanz](https://github.com/Illidanz) - Creating [hacktools](https://github.com/Illidanz/hacktools)
